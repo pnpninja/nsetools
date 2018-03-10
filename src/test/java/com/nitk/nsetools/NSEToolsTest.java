@@ -22,13 +22,19 @@ public class NSEToolsTest {
     
     @Test
     public void checkStockCode() throws Exception {
-        assertTrue(nse.isValidQuote("ZUARI"));
-        assertTrue(!nse.isValidQuote("gothillaindustries"));
+        assertTrue(nse.isValidCode("ZUARI"));
+        assertTrue(!nse.isValidCode("gothillaindustries"));
     }
     
     @Test
     public void checkIndexList() throws Exception{
         assertTrue(nse.getIndexList().contains("NIFTY 50"));
         assertTrue(nse.getIndexList().contains("NIFTY GS COMPSITE"));
+    }
+    
+    @Test
+    public void checkIsValidIndex() throws Exception{
+        assertTrue(nse.isValidIndex("Nifty 50"));
+        assertTrue(!nse.isValidIndex("INDEX GOTHILLA"));
     }
 }

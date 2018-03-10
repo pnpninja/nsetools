@@ -73,7 +73,7 @@ public class NSETools implements NSEToolsInterface{
     
 
     @Override
-    public boolean isValidQuote(String stockCode) throws Exception {
+    public boolean isValidCode(String stockCode) throws Exception {
         return this.getStockCodes().containsKey(stockCode.toUpperCase());
     }
 
@@ -106,6 +106,11 @@ public class NSETools implements NSEToolsInterface{
             }
         }
        
+    }
+    
+    @Override
+    public boolean isValidIndex(String index) throws Exception {
+        return this.getIndexList().contains(index.toUpperCase());
     }
     
     private void methodCleanup(CloseableHttpClient chc,CloseableHttpResponse chr,Object dataObj) throws Exception {
