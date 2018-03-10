@@ -3,6 +3,7 @@ package com.nitk.nsetools;
 import org.junit.*;
 import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
+import java.util.List;
 
 public class NSEToolsTest {
     
@@ -23,5 +24,11 @@ public class NSEToolsTest {
     public void checkStockCode() throws Exception {
         assertTrue(nse.isValidQuote("ZUARI"));
         assertTrue(!nse.isValidQuote("gothillaindustries"));
+    }
+    
+    @Test
+    public void checkIndexList() throws Exception{
+        assertTrue(nse.getIndexList().contains("NIFTY 50"));
+        assertTrue(nse.getIndexList().contains("NIFTY GS COMPSITE"));
     }
 }
