@@ -3,5 +3,5 @@ import java.util.HashMap;
 
 public interface NSEToolsInterface {
     public HashMap<String,String> getStockCodes() throws Exception;  
-
+    public boolean isValidQuote(String stockCode) throws Exception;
 }

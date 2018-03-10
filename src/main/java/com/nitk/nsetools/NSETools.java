@@ -63,5 +63,10 @@ public class NSETools implements NSEToolsInterface{
     public HashMap<String,String> getStockCodes() throws Exception{
         return this.getStockCodes(true);
     }
+
+    @Override
+    public boolean isValidQuote(String stockCode) throws Exception {
+        return this.getStockCodes().containsKey(stockCode.toUpperCase());
+    }
     
 }

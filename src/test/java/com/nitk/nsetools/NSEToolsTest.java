@@ -14,8 +14,14 @@ public class NSEToolsTest {
     }
         
     @Test
-    public void assertGetStockCodes() throws Exception {
+    public void checkGetStockCodes() throws Exception {
         assertTrue(nse.getStockCodes().get("ADVENZYMES").equals("Advanced Enzyme Technologies Limited"));
         assertTrue(nse.getStockCodes().get("ZUARI").equals("Zuari Agro Chemicals Limited"));
+    }
+    
+    @Test
+    public void checkStockCode() throws Exception {
+        assertTrue(nse.isValidQuote("ZUARI"));
+        assertTrue(!nse.isValidQuote("gothillaindustries"));
     }
 }
