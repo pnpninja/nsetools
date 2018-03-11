@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.nitk.nsetools.domain.StocksCsv;
+import com.nitk.nsetools.util.CSVtoJsonUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
@@ -41,10 +43,11 @@ public class NSETools implements NSEToolsInterface{
     private static String indexURL;
     private static String bhavCopyBaseURL;
     private static String bhavCopyBaseFileName;
-    private HashMap<String,String> stockCodes = null;
+    //private HashMap<String,String> stockCodes = null;
+    private List<StocksCsv> stockCodes = null;
     private List<String> indexList = null;
     
-    public HashMap<String,String> getStockCodes() throws Exception{
+    public List<StocksCsv> getStockCodes() throws Exception{
         if(this.stockCodes!=null) {
             return this.stockCodes;
         }else {
@@ -56,13 +59,15 @@ public class NSETools implements NSEToolsInterface{
                 throw new HttpException("Unable to connect to NSE");
             }
             try {
-                this.stockCodes = new HashMap<String,String>();
-                BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                this.stockCodes = new ArrayList<>();
+                this.stockCodes = CSVtoJsonUtil.getStocksInJson(response.getEntity().getContent());
+                //System.out.println("Stocks in JSON "+stockCodes.size());
+                /*BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
                 String line = rd.readLine();
                 while ((line = rd.readLine()) != null) {
                     this.stockCodes.put(line.split(",")[0], line.split(",")[1]);
                 }
-                methodCleanup(client,response,null);
+                methodCleanup(client,response,null);*/
                 return this.stockCodes;
             }catch(Exception e) {
                 methodCleanup(client,response,this.stockCodes);
@@ -74,7 +79,13 @@ public class NSETools implements NSEToolsInterface{
 
     @Override
     public boolean isValidCode(String stockCode) throws Exception {
-        return this.getStockCodes().containsKey(stockCode.toUpperCase());
+        Boolean isStockCodePresent = false;
+        for (int i = 0; i < this.getStockCodes().size(); i++) {
+            if(stockCode.equalsIgnoreCase(this.getStockCodes().get(i).getSymbol())){
+                isStockCodePresent = true;
+            }
+        }
+        return isStockCodePresent;
     }
 
     @Override
