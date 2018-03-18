@@ -18,13 +18,22 @@ import java.util.stream.IntStream;
 
 import javax.xml.crypto.Data;
 
+import com.nitk.nsetools.domain.Stock;
+import com.nitk.nsetools.util.CSVtoJsonUtil;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -53,10 +62,11 @@ public class NSETools implements ExchangeToolsInterface{
     private static String indexURL;
     private static String bhavCopyBaseURL;
     private static String bhavCopyBaseFileName;
-    private HashMap<String,String> stockCodes = null;
+    //private HashMap<String,String> stockCodes = null;
+    private List<Stock> stockCodes = null;
     private List<String> indexList = null;
     
-    public synchronized HashMap<String,String> getStockCodes() throws Exception{
+    public synchronized List<Stock> getStockCodes() throws Exception{
         if(this.stockCodes!=null) {
             return this.stockCodes;
         }else {
@@ -67,13 +77,15 @@ public class NSETools implements ExchangeToolsInterface{
                 throw new HttpException("Unable to connect to NSE");
             }
             try {
-                this.stockCodes = new HashMap<String,String>();
-                BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                this.stockCodes = new ArrayList<>();
+                this.stockCodes = CSVtoJsonUtil.getStocksInJson(response.getEntity().getContent());
+                //System.out.println("Stocks in JSON "+stockCodes.size());
+                /*BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
                 String line = rd.readLine();
                 while ((line = rd.readLine()) != null) {
                     this.stockCodes.put(line.split(",")[0], line.split(",")[1]);
                 }
-                methodCleanup(client,response,null);
+                methodCleanup(client,response,null);*/
                 return this.stockCodes;
             }catch(Exception e) {
                 methodCleanup(client,response,this.stockCodes);
@@ -85,7 +97,13 @@ public class NSETools implements ExchangeToolsInterface{
 
     @Override
     public boolean isValidCode(String stockCode) throws Exception {
-        return this.getStockCodes().containsKey(stockCode.toUpperCase());
+        Boolean isStockCodePresent = false;
+        for (int i = 0; i < this.getStockCodes().size(); i++) {
+            if(stockCode.equalsIgnoreCase(this.getStockCodes().get(i).getSymbol())){
+                isStockCodePresent = true;
+            }
+        }
+        return isStockCodePresent;
     }
 
     @Override
@@ -235,12 +253,12 @@ public class NSETools implements ExchangeToolsInterface{
                     } catch (Exception e1) {
                         throw new RuntimeException(e1);
                     }
-                   
+
                 });
             }catch(Exception e) {
                 throw e;
             }
-            
+
             methodCleanup(client,response,null);
             return top;
         }catch(Exception e) {
@@ -254,10 +272,10 @@ public class NSETools implements ExchangeToolsInterface{
     public List<StockQuote> getTopLosers() throws Exception {
         return this.getTop(topLoserURL);
     }
-    
+
     public List<StockQuote> getTopGainers() throws Exception {
         // TODO Auto-generated method stub
         return this.getTop(topGainerURL);
     }
-    
+
 }
