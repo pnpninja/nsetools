@@ -20,7 +20,16 @@ public final  class CSVtoJsonUtil {
             // processing code here
             List<Stock> stocksJson = in.lines().skip(1).map(line -> {
                 String[] x = pattern.split(line);
-                return new Stock(x[0], x[1], x[2], x[3], Integer.parseInt(x[4]), Integer.parseInt(x[5]), x[6], Integer.parseInt(x[7]));
+                return new Stock.Builder()
+                        .symbol(x[0])
+                        .companyName(x[1])
+                        .series(x[2])
+                        .dateOfListing(x[3])
+                        .paidUpValue(Integer.parseInt(x[4]))
+                        .marketLot(Integer.parseInt(x[5]))
+                        .isinNumber(x[6])
+                        .faceValue(Integer.parseInt(x[7]))
+                        .build();
             }).collect(Collectors.toList());
             Type listOfStockObjects = new TypeToken<List<Stock>>() {
             }.getType();

@@ -1,6 +1,69 @@
 package com.nitk.nsetools.domain;
 
 public class Stock {
+    public static class Builder{
+        private String symbol;
+        private String companyName;
+        private String series;
+        private String dateOfListing;
+        private Integer paidUpValue;
+        private Integer marketLot;
+        private String isinNumber;
+        private Integer faceValue;
+
+        public Builder symbol(String symbol) {
+            this.symbol = symbol;
+            return this;
+        }
+
+        public Builder companyName(String companyName) {
+            this.companyName = companyName;
+            return this;
+        }
+
+        public Builder series(String series) {
+            this.series = series;
+            return this;
+        }
+
+        public Builder dateOfListing(String dateOfListing) {
+            this.dateOfListing = dateOfListing;
+            return this;
+        }
+
+        public Builder paidUpValue(Integer paidUpValue) {
+            this.paidUpValue = paidUpValue;
+            return this;
+        }
+
+        public Builder marketLot(Integer marketLot) {
+            this.marketLot = marketLot;
+            return this;
+        }
+
+        public Builder isinNumber(String isinNumber) {
+            this.isinNumber = isinNumber;
+            return this;
+        }
+
+        public Builder faceValue(Integer faceValue) {
+            this.faceValue = faceValue;
+            return this;
+        }
+
+        public Stock build(){
+            Stock stock = new Stock();
+            stock.symbol = this.symbol;
+            stock.companyName = this.companyName;
+            stock.dateOfListing = this.dateOfListing;
+            stock.faceValue = this.faceValue;
+            stock.isinNumber = this.isinNumber;
+            stock.paidUpValue = this.paidUpValue;
+            stock.series = this.series;
+            stock.marketLot = this.marketLot;
+            return stock;
+        }
+    }
     private String symbol;
     private String companyName;
     private String series;
@@ -42,15 +105,7 @@ public class Stock {
         return faceValue;
     }
 
-    public Stock(String symbol, String companyName, String series, String dateOfListing, Integer paidUpValue, Integer marketLot, String isinNumber, Integer faceValue) {
-        this.symbol = symbol;
-        this.companyName = companyName;
-        this.series = series;
-        this.dateOfListing = dateOfListing;
-        this.paidUpValue = paidUpValue;
-        this.marketLot = marketLot;
-        this.isinNumber = isinNumber;
-        this.faceValue = faceValue;
+    private Stock() {
     }
 
     @Override
