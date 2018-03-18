@@ -3,6 +3,7 @@ package com.nitk.nsetools;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,6 +11,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ForkJoinPool;
+import java.util.function.IntPredicate;
+import java.util.stream.IntStream;
+
+import javax.xml.crypto.Data;
 
 import com.nitk.nsetools.domain.Stock;
 import com.nitk.nsetools.util.CSVtoJsonUtil;
@@ -59,15 +66,14 @@ public class NSETools implements ExchangeToolsInterface{
     private List<Stock> stockCodes = null;
     private List<String> indexList = null;
     
-    public List<Stock> getStockCodes() throws Exception{
+    public synchronized List<Stock> getStockCodes() throws Exception{
         if(this.stockCodes!=null) {
             return this.stockCodes;
         }else {
             CloseableHttpClient client = HttpClientBuilder.create().build();
             CloseableHttpResponse response = client.execute(new HttpGet(stocksCSVURL));
             if(response.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
-                response.close();
-                client.close();
+                methodCleanup(client, response, null);
                 throw new HttpException("Unable to connect to NSE");
             }
             try {
@@ -108,8 +114,7 @@ public class NSETools implements ExchangeToolsInterface{
             CloseableHttpClient client = HttpClientBuilder.create().build();
             CloseableHttpResponse response = client.execute(new HttpGet(indexURL));
             if(response.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
-                response.close();
-                client.close();
+                methodCleanup(client, response, null);
                 throw new HttpException("Unable to connect to NSE");
             }
             try {
@@ -169,15 +174,15 @@ public class NSETools implements ExchangeToolsInterface{
                 methodCleanup(client,response,this.indexList);
                 throw e;
             }
-
+            
         }
-
+        
     }
-
+    
     private String buildURLForQuote(String quote,Integer illiquidValue,Integer smeFlag,Integer itpFlag) {
-        return getQuoteURL+"symbol="+quote+"&illiquid="+illiquidValue.toString()+"&smeFlag="+smeFlag.toString()+"&itpFlag="+itpFlag.toString();
+        return getQuoteURL+"symbol="+URLEncoder.encode(quote)+"&illiquid="+illiquidValue.toString()+"&smeFlag="+smeFlag.toString()+"&itpFlag="+itpFlag.toString();
     }
-
+    
     private StockQuote prepareStockQuote(JSONObject data) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, ParseException {
         StockQuote stockQuote = new StockQuote();
         for(Iterator iterator = data.keySet().iterator(); iterator.hasNext();) {
@@ -208,19 +213,69 @@ public class NSETools implements ExchangeToolsInterface{
                     ||key.equalsIgnoreCase("applicableMargin")
                     ||key.equalsIgnoreCase("pChange")
                     ||key.equalsIgnoreCase("cm_ffm")
-                    ||key.equalsIgnoreCase("totalTradedVolume")) {
-                this.setFieldInObject(stockQuote, key, new BigDecimal(((String)data.get(key)).replaceAll(",","")));
+                    ||key.equalsIgnoreCase("totalTradedVolume")) {             
+                this.setFieldInObject(stockQuote, key, new BigDecimal(((String)data.get(key)).replaceAll(",","")));               
             }else {
                 this.setFieldInObject(stockQuote, key, (String)data.get(key));
             }
         }
         return stockQuote;
     }
-
+    
     private void setFieldInObject(Object object,String fieldName,Object value) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
         Field f = object.getClass().getDeclaredField(fieldName);
         f.setAccessible(true);
         f.set(object,value);
+    }
+
+
+    private List<StockQuote> getTop(String URL) throws Exception {
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        CloseableHttpResponse response = client.execute(new HttpGet(URL));
+        if(response.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
+            response.close();
+            client.close();
+            throw new HttpException("Unable to connect to NSE");
+        }
+        try {
+            JSONObject jsonObject = (JSONObject)new JSONParser().parse(
+                    new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+            JSONArray dataArray = (JSONArray) jsonObject.get("data");
+
+            CopyOnWriteArrayList<StockQuote> top = new CopyOnWriteArrayList<>();
+            final boolean exceptionFlag;
+            Exception ex = null;
+            try {
+                dataArray.parallelStream().forEach(e->{
+                    JSONObject temp = (JSONObject) e;
+                    try {
+                        top.add(this.getQuote((String)temp.get("symbol")));
+                    } catch (Exception e1) {
+                        throw new RuntimeException(e1);
+                    }
+
+                });
+            }catch(Exception e) {
+                throw e;
+            }
+
+            methodCleanup(client,response,null);
+            return top;
+        }catch(Exception e) {
+            methodCleanup(client,response,null);
+            throw e;
+        }
+    }
+
+
+    @Override
+    public List<StockQuote> getTopLosers() throws Exception {
+        return this.getTop(topLoserURL);
+    }
+
+    public List<StockQuote> getTopGainers() throws Exception {
+        // TODO Auto-generated method stub
+        return this.getTop(topGainerURL);
     }
 
 }

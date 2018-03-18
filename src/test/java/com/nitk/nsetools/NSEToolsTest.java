@@ -74,7 +74,27 @@ public class NSEToolsTest {
             assertTrue(dateFormat.format(stockQuote.getCm_adj_low_dt()).equals("22-Aug-17"));
         }catch(Exception e) {
             assertTrue(false);
+        }      
+    }
+    
+    @Test
+    public void checkTopGainersFunction() throws Exception {
+        try {
+            List<StockQuote> topGainersList = nse.getTopGainers();
+            assertTrue(true);
+        }catch(Exception e) {
+            assertTrue(false);
         }
-        
+    }
+    
+    
+    @Test
+    public void checkTopLosersFunction() throws Exception {
+        try {
+            List<StockQuote> topLosersList = nse.getTopLosers();
+            assertTrue(true);
+        }catch(Exception e) {
+            assertTrue(false);
+        }
     }
 }
