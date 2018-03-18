@@ -13,6 +13,7 @@ import java.util.List;
 
 import com.nitk.nsetools.domain.Stock;
 import com.nitk.nsetools.util.CSVtoJsonUtil;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
@@ -171,6 +172,55 @@ public class NSETools implements ExchangeToolsInterface{
 
         }
 
+    }
+
+    private String buildURLForQuote(String quote,Integer illiquidValue,Integer smeFlag,Integer itpFlag) {
+        return getQuoteURL+"symbol="+quote+"&illiquid="+illiquidValue.toString()+"&smeFlag="+smeFlag.toString()+"&itpFlag="+itpFlag.toString();
+    }
+
+    private StockQuote prepareStockQuote(JSONObject data) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, ParseException {
+        StockQuote stockQuote = new StockQuote();
+        for(Iterator iterator = data.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            if(data.get(key).equals("-")) {
+                this.setFieldInObject(stockQuote, key, null);
+            }else if(key.equalsIgnoreCase("priceBand")&&data.get(key).toString().equalsIgnoreCase("No Band")) {
+                this.setFieldInObject(stockQuote, key, null);
+            }else if(key.equalsIgnoreCase("secDate")) {
+                this.setFieldInObject(stockQuote, key, new SimpleDateFormat("ddMMMyyyy").parse(data.get(key).toString()));
+            }else if(key.equalsIgnoreCase("isExDateFlag")) {
+                this.setFieldInObject(stockQuote, key, (boolean)data.get(key));
+            }else if(key.toLowerCase().contains("date")||key.equalsIgnoreCase("cm_adj_high_dt")||key.equalsIgnoreCase("cm_adj_low_dt")) {
+                this.setFieldInObject(stockQuote, key, new SimpleDateFormat("dd-MMM-yyyy").parse(data.get(key).toString()));
+            }else if(key.toLowerCase().contains("price")
+                    ||key.toLowerCase().contains("quantity")
+                    ||key.toLowerCase().contains("value")
+                    ||key.toLowerCase().contains("margin")
+                    ||key.equalsIgnoreCase("varMargin")
+                    ||key.equalsIgnoreCase("securityVar")
+                    ||key.equalsIgnoreCase("open")
+                    ||key.equalsIgnoreCase("previousClose")
+                    ||key.equalsIgnoreCase("dayHigh")
+                    ||key.equalsIgnoreCase("dayLow")
+                    ||key.equalsIgnoreCase("high52")
+                    ||key.equalsIgnoreCase("low52")
+                    ||key.equalsIgnoreCase("change")
+                    ||key.equalsIgnoreCase("applicableMargin")
+                    ||key.equalsIgnoreCase("pChange")
+                    ||key.equalsIgnoreCase("cm_ffm")
+                    ||key.equalsIgnoreCase("totalTradedVolume")) {
+                this.setFieldInObject(stockQuote, key, new BigDecimal(((String)data.get(key)).replaceAll(",","")));
+            }else {
+                this.setFieldInObject(stockQuote, key, (String)data.get(key));
+            }
+        }
+        return stockQuote;
+    }
+
+    private void setFieldInObject(Object object,String fieldName,Object value) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+        Field f = object.getClass().getDeclaredField(fieldName);
+        f.setAccessible(true);
+        f.set(object,value);
     }
 
 }
