@@ -1,5 +1,7 @@
 package com.nitk.nsetools;
 
+import com.nitk.nsetools.domain.Indices;
+import com.nitk.nsetools.domain.ListOfIndices;
 import com.nitk.nsetools.domain.Stock;
 import com.nitk.nsetools.domain.StockQuote;
 import java.util.HashMap;
@@ -13,4 +15,5 @@ public interface ExchangeToolsInterface {
     public StockQuote getQuote(String symbol) throws Exception;
     public List<StockQuote> getTopGainers() throws Exception;
     public List<StockQuote> getTopLosers() throws Exception;
+    public ListOfIndices getIndices() throws Exception;
 }

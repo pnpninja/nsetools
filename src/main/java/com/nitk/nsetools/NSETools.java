@@ -18,15 +18,17 @@ import java.util.stream.IntStream;
 
 import javax.xml.crypto.Data;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.nitk.nsetools.domain.Indices;
+import com.nitk.nsetools.domain.ListOfIndices;
 import com.nitk.nsetools.domain.Stock;
 import com.nitk.nsetools.util.CSVtoJsonUtil;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpException;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
+import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -267,10 +269,43 @@ public class NSETools implements ExchangeToolsInterface{
         }
     }
 
+    private ListOfIndices getAllIndices(String URL) throws IOException{
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        try{
+            HttpGet httpGet = new HttpGet(URL);
+
+            ResponseHandler<ListOfIndices> responseHandler = new ResponseHandler<ListOfIndices>() {
+                @Override
+                public ListOfIndices handleResponse(HttpResponse httpResponse) throws ClientProtocolException, IOException {
+                    StatusLine statusLine = httpResponse.getStatusLine();
+                    HttpEntity entity = httpResponse.getEntity();
+
+                    if (statusLine.getStatusCode() >= 300)
+                        throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase()+" Or Unable to connect to NSE");
+
+                    if (entity == null)
+                        throw new ClientProtocolException("Response contains no content");
+
+                    Gson gson = new GsonBuilder().create();
+                    return gson.fromJson(EntityUtils.toString(entity), ListOfIndices.class);
+                }
+            };
+            return client.execute(httpGet, responseHandler);
+        }catch(Exception e) {
+            //methodCleanup(client,response,this.indexList);
+            throw e;
+        }
+    }
+
 
     @Override
     public List<StockQuote> getTopLosers() throws Exception {
         return this.getTop(topLoserURL);
+    }
+
+    @Override
+    public ListOfIndices getIndices() throws Exception {
+        return this.getAllIndices(indexURL);
     }
 
     public List<StockQuote> getTopGainers() throws Exception {

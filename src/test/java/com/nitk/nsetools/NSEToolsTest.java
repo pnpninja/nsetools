@@ -1,5 +1,6 @@
 package com.nitk.nsetools;
 
+import com.nitk.nsetools.domain.ListOfIndices;
 import org.junit.*;
 
 import com.nitk.nsetools.domain.StockQuote;
@@ -92,6 +93,16 @@ public class NSEToolsTest {
     public void checkTopLosersFunction() throws Exception {
         try {
             List<StockQuote> topLosersList = nse.getTopLosers();
+            assertTrue(true);
+        }catch(Exception e) {
+            assertTrue(false);
+        }
+    }
+
+    @Test
+    public void checkIndices() throws Exception {
+        try {
+            ListOfIndices listOfIndices = nse.getIndices();
             assertTrue(true);
         }catch(Exception e) {
             assertTrue(false);
