@@ -7,7 +7,6 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +39,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import com.nitk.nsetools.domain.StockQuote;
@@ -243,24 +241,16 @@ public class NSETools implements ExchangeToolsInterface{
             JSONObject jsonObject = (JSONObject)new JSONParser().parse(
                     new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
             JSONArray dataArray = (JSONArray) jsonObject.get("data");
-
             CopyOnWriteArrayList<StockQuote> top = new CopyOnWriteArrayList<>();
-            final boolean exceptionFlag;
-            Exception ex = null;
-            try {
-                dataArray.parallelStream().forEach(e->{
-                    JSONObject temp = (JSONObject) e;
+
+            dataArray.parallelStream().forEach(e->{
+                JSONObject temp = (JSONObject) e;
                     try {
                         top.add(this.getQuote((String)temp.get("symbol")));
                     } catch (Exception e1) {
                         throw new RuntimeException(e1);
                     }
-
-                });
-            }catch(Exception e) {
-                throw e;
-            }
-
+            });
             methodCleanup(client,response,null);
             return top;
         }catch(Exception e) {
@@ -312,5 +302,5 @@ public class NSETools implements ExchangeToolsInterface{
         // TODO Auto-generated method stub
         return this.getTop(topGainerURL);
     }
-
+    
 }
