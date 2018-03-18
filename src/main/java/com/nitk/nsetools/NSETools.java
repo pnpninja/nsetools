@@ -220,28 +220,26 @@ public class NSETools implements ExchangeToolsInterface{
             throw new HttpException("Unable to connect to NSE");
         }
         try {
-            List<StockQuote> top = new ArrayList<StockQuote>();
             JSONObject jsonObject = (JSONObject)new JSONParser().parse(
                     new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
             JSONArray dataArray = (JSONArray) jsonObject.get("data");
-            
-            for(int iter=0;iter<dataArray.size();iter++) {
-                JSONObject temp = (JSONObject) dataArray.get(iter);
-                top.add(this.getQuote((String)temp.get("symbol")));
+
+            CopyOnWriteArrayList<StockQuote> top = new CopyOnWriteArrayList<>();
+            final boolean exceptionFlag;
+            Exception ex = null;
+            try {
+                dataArray.parallelStream().forEach(e->{
+                    JSONObject temp = (JSONObject) e;
+                    try {
+                        top.add(this.getQuote((String)temp.get("symbol")));
+                    } catch (Exception e1) {
+                        throw new RuntimeException(e1);
+                    }
+                   
+                });
+            }catch(Exception e) {
+                throw e;
             }
-//TODO - Parallelize the operation for fast execution.
-//            CopyOnWriteArrayList<StockQuote> top = new CopyOnWriteArrayList<>();
-//            boolean exceptionFlag = false;
-//            Exception ex = null;
-//            try {
-//                dataArray.parallelStream().forEach(e->{
-//                    JSONObject temp = (JSONObject) e;
-//                    top.add(this.getQuote((String)temp.get("symbol")));
-//                   
-//                });
-//            }catch(Exception e) {
-//                throw e;
-//            }
             
             methodCleanup(client,response,null);
             return top;
