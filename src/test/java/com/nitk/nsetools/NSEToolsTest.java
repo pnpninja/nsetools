@@ -1,7 +1,14 @@
 package com.nitk.nsetools;
 
 import org.junit.*;
+
+import com.nitk.nsetools.domain.StockQuote;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,5 +49,32 @@ public class NSEToolsTest {
     public void checkIsValidIndex() throws Exception{
         assertTrue(nse.isValidIndex("Nifty 50"));
         assertTrue(!nse.isValidIndex("INDEX GOTHILLA"));
+    }
+    
+    @Test
+    public void checkGetQuoteFunctionForInvalidQuote(){
+        try {
+            StockQuote stockQuote = nse.getQuote("INDEX Gothilla");
+        }catch(Exception e) {
+            assertEquals("Symbol - INDEX Gothilla - is invalid",e.getMessage());
+        }
+    }
+    
+    @Test
+    public void checkGetQuoteFunctionForValidQuote() {
+        try{
+            StockQuote stockQuote = nse.getQuote("INFY");
+            assertTrue(stockQuote.getCompanyName().equalsIgnoreCase("Infosys Limited"));
+            assertTrue(stockQuote.getSeries().equalsIgnoreCase("EQ"));
+            assertTrue(stockQuote.getLastPrice()!=null);
+            assertTrue(stockQuote.getPriceBand()==null);
+            assertTrue(stockQuote.getIsinCode().equalsIgnoreCase("INE009A01021"));
+            assertTrue(stockQuote.getCm_adj_low_dt().getDate()==22);
+            DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
+            assertTrue(dateFormat.format(stockQuote.getCm_adj_low_dt()).equals("22-Aug-17"));
+        }catch(Exception e) {
+            assertTrue(false);
+        }
+        
     }
 }
