@@ -24,14 +24,8 @@ public class NSEToolsTest {
         
     @Test
     public void checkGetStockCodes() throws Exception {
-        for (int i = 0; i < nse.getStockCodes().size(); i++) {
-            if(nse.getStockCodes().get(i).getSymbol().equalsIgnoreCase("ADVENZYMES")){
-                assertTrue(nse.getStockCodes().get(i).getCompanyName().equals("Advanced Enzyme Technologies Limited"));
-            }
-            if(nse.getStockCodes().get(i).getSymbol().equalsIgnoreCase("ZUARI")){
-                assertTrue(nse.getStockCodes().get(i).getCompanyName().equals("Zuari Agro Chemicals Limited"));
-            }
-        }
+        assertTrue(nse.getStockCodes().get("ADVENZYMES").equals("Advanced Enzyme Technologies Limited"));
+        assertTrue(nse.getStockCodes().get("ZUARI").equals("Zuari Agro Chemicals Limited"));
     }
     
     @Test
