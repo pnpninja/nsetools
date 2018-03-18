@@ -10,6 +10,10 @@ public class ListOfIndices {
     private String haltedStatus;
     private Integer mktOpen;
     private List<Indices> data;
+    private Integer code;
+    private Integer corrClose;
+    private Integer preClose;
+    private Integer mktClose;
 
     public Integer getPreOpen() {
         return preOpen;
@@ -71,6 +75,42 @@ public class ListOfIndices {
 
     public ListOfIndices setData(List<Indices> data) {
         this.data = data;
+        return this;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public ListOfIndices setCode(Integer code) {
+        this.code = code;
+        return this;
+    }
+
+    public Integer getCorrClose() {
+        return corrClose;
+    }
+
+    public ListOfIndices setCorrClose(Integer corrClose) {
+        this.corrClose = corrClose;
+        return this;
+    }
+
+    public Integer getPreClose() {
+        return preClose;
+    }
+
+    public ListOfIndices setPreClose(Integer preClose) {
+        this.preClose = preClose;
+        return this;
+    }
+
+    public Integer getMktClose() {
+        return mktClose;
+    }
+
+    public ListOfIndices setMktClose(Integer mktClose) {
+        this.mktClose = mktClose;
         return this;
     }
 
