@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.nitk.nsetools.domain.StocksCsv;
+import com.nitk.nsetools.domain.Stock;
 import com.nitk.nsetools.util.CSVtoJsonUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
@@ -44,10 +44,10 @@ public class NSETools implements NSEToolsInterface{
     private static String bhavCopyBaseURL;
     private static String bhavCopyBaseFileName;
     //private HashMap<String,String> stockCodes = null;
-    private List<StocksCsv> stockCodes = null;
+    private List<Stock> stockCodes = null;
     private List<String> indexList = null;
     
-    public List<StocksCsv> getStockCodes() throws Exception{
+    public List<Stock> getStockCodes() throws Exception{
         if(this.stockCodes!=null) {
             return this.stockCodes;
         }else {

@@ -1,14 +1,14 @@
 package com.nitk.nsetools.domain;
 
-public class StocksCsv {
-    String symbol;
-    String companyName;
-    String series;
-    String dateOfListing;
-    Integer paidUpValue;
-    Integer marketLot;
-    String isinNumber;
-    Integer faceValue;
+public class Stock {
+    private String symbol;
+    private String companyName;
+    private String series;
+    private String dateOfListing;
+    private Integer paidUpValue;
+    private Integer marketLot;
+    private String isinNumber;
+    private Integer faceValue;
 
     public String getSymbol() {
         return symbol;
@@ -42,7 +42,7 @@ public class StocksCsv {
         return faceValue;
     }
 
-    public StocksCsv(String symbol, String companyName, String series, String dateOfListing, Integer paidUpValue, Integer marketLot, String isinNumber, Integer faceValue) {
+    public Stock(String symbol, String companyName, String series, String dateOfListing, Integer paidUpValue, Integer marketLot, String isinNumber, Integer faceValue) {
         this.symbol = symbol;
         this.companyName = companyName;
         this.series = series;
@@ -55,7 +55,7 @@ public class StocksCsv {
 
     @Override
     public String toString() {
-        return "StocksCsv{" +
+        return "Stock{" +
                 "symbol='" + symbol + '\'' +
                 ", companyName='" + companyName + '\'' +
                 ", series='" + series + '\'' +
