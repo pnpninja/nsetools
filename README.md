@@ -13,8 +13,8 @@ Main Features:
 
 * Getting live quotes for stocks using stock codes. (DONE)
 * Getting quotes for all the indices traded in NSE, e.g CNX NIFTY, BANKNIFTY etc. (To be done)
-* Getting list of top losers. (DONE - but needs to be parallelized)
-* Getting list of top gainers. (DONE - but needs to be parallelized)
+* Getting list of top losers. (DONE)
+* Getting list of top gainers. (DONE)
 * Helper APIs to check whether a given stock code or index code is correct. (DONE)
 * Getting list of all indices and stocks. (DONE)
 
