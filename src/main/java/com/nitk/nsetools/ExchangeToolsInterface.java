@@ -10,4 +10,6 @@ public interface ExchangeToolsInterface {
     public List<String> getIndexList() throws Exception;
     public boolean isValidIndex(String index) throws Exception;
     public StockQuote getQuote(String symbol) throws Exception;
+    public List<StockQuote> getTopGainers() throws Exception;
+    public List<StockQuote> getTopLosers() throws Exception;
 }

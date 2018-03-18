@@ -3,6 +3,7 @@ package com.nitk.nsetools;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,6 +11,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ForkJoinPool;
+import java.util.function.IntPredicate;
+import java.util.stream.IntStream;
+
+import javax.xml.crypto.Data;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpException;
@@ -49,15 +56,14 @@ public class NSETools implements ExchangeToolsInterface{
     private HashMap<String,String> stockCodes = null;
     private List<String> indexList = null;
     
-    public HashMap<String,String> getStockCodes() throws Exception{
+    public synchronized HashMap<String,String> getStockCodes() throws Exception{
         if(this.stockCodes!=null) {
             return this.stockCodes;
         }else {
             CloseableHttpClient client = HttpClientBuilder.create().build();
             CloseableHttpResponse response = client.execute(new HttpGet(stocksCSVURL));
             if(response.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
-                response.close();
-                client.close();
+                methodCleanup(client, response, null);
                 throw new HttpException("Unable to connect to NSE");
             }
             try {
@@ -90,8 +96,7 @@ public class NSETools implements ExchangeToolsInterface{
             CloseableHttpClient client = HttpClientBuilder.create().build();
             CloseableHttpResponse response = client.execute(new HttpGet(indexURL));
             if(response.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
-                response.close();
-                client.close();
+                methodCleanup(client, response, null);
                 throw new HttpException("Unable to connect to NSE");
             }
             try {
@@ -157,7 +162,7 @@ public class NSETools implements ExchangeToolsInterface{
     }
     
     private String buildURLForQuote(String quote,Integer illiquidValue,Integer smeFlag,Integer itpFlag) {
-        return getQuoteURL+"symbol="+quote+"&illiquid="+illiquidValue.toString()+"&smeFlag="+smeFlag.toString()+"&itpFlag="+itpFlag.toString();
+        return getQuoteURL+"symbol="+URLEncoder.encode(quote)+"&illiquid="+illiquidValue.toString()+"&smeFlag="+smeFlag.toString()+"&itpFlag="+itpFlag.toString();
     }
     
     private StockQuote prepareStockQuote(JSONObject data) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, ParseException {
@@ -203,6 +208,58 @@ public class NSETools implements ExchangeToolsInterface{
         Field f = object.getClass().getDeclaredField(fieldName);
         f.setAccessible(true);
         f.set(object,value);
+    }
+
+
+    private List<StockQuote> getTop(String URL) throws Exception {
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        CloseableHttpResponse response = client.execute(new HttpGet(URL));
+        if(response.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
+            response.close();
+            client.close();
+            throw new HttpException("Unable to connect to NSE");
+        }
+        try {
+            List<StockQuote> top = new ArrayList<StockQuote>();
+            JSONObject jsonObject = (JSONObject)new JSONParser().parse(
+                    new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+            JSONArray dataArray = (JSONArray) jsonObject.get("data");
+            
+            for(int iter=0;iter<dataArray.size();iter++) {
+                JSONObject temp = (JSONObject) dataArray.get(iter);
+                top.add(this.getQuote((String)temp.get("symbol")));
+            }
+//TODO - Parallelize the operation for fast execution.
+//            CopyOnWriteArrayList<StockQuote> top = new CopyOnWriteArrayList<>();
+//            boolean exceptionFlag = false;
+//            Exception ex = null;
+//            try {
+//                dataArray.parallelStream().forEach(e->{
+//                    JSONObject temp = (JSONObject) e;
+//                    top.add(this.getQuote((String)temp.get("symbol")));
+//                   
+//                });
+//            }catch(Exception e) {
+//                throw e;
+//            }
+            
+            methodCleanup(client,response,null);
+            return top;
+        }catch(Exception e) {
+            methodCleanup(client,response,null);
+            throw e;
+        }
+    }
+
+
+    @Override
+    public List<StockQuote> getTopLosers() throws Exception {
+        return this.getTop(topLoserURL);
+    }
+    
+    public List<StockQuote> getTopGainers() throws Exception {
+        // TODO Auto-generated method stub
+        return this.getTop(topGainerURL);
     }
     
 }
