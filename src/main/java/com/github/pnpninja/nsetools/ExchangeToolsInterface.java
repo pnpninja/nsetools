@@ -1,9 +1,10 @@
-package com.nitk.nsetools;
+package com.github.pnpninja.nsetools;
 
-import com.nitk.nsetools.domain.IndexQuote;
-import com.nitk.nsetools.domain.StockQuote;
 import java.util.HashMap;
 import java.util.List;
+
+import com.github.pnpninja.nsetools.domain.IndexQuote;
+import com.github.pnpninja.nsetools.domain.StockQuote;
 
 public interface ExchangeToolsInterface {
     public HashMap<String,String> getStockCodes() throws Exception;  

@@ -1,4 +1,4 @@
-package com.nitk.nsetools;
+package com.github.pnpninja.nsetools;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -24,8 +24,8 @@ import org.json.simple.parser.JSONParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
-import com.nitk.nsetools.domain.IndexQuote;
-import com.nitk.nsetools.domain.StockQuote;
+import com.github.pnpninja.nsetools.domain.IndexQuote;
+import com.github.pnpninja.nsetools.domain.StockQuote;
 
 public class NSETools implements ExchangeToolsInterface{
     static {

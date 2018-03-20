@@ -1,4 +1,4 @@
-package com.nitk.nsetools.domain;
+package com.github.pnpninja.nsetools.domain;
 
 import java.math.BigDecimal;
 import java.util.Date;

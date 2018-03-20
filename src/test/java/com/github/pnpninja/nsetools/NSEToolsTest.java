@@ -1,9 +1,10 @@
-package com.nitk.nsetools;
+package com.github.pnpninja.nsetools;
 
 import org.junit.*;
 
-import com.nitk.nsetools.domain.IndexQuote;
-import com.nitk.nsetools.domain.StockQuote;
+import com.github.pnpninja.nsetools.NSETools;
+import com.github.pnpninja.nsetools.domain.IndexQuote;
+import com.github.pnpninja.nsetools.domain.StockQuote;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
