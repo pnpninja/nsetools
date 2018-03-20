@@ -24,6 +24,7 @@ import org.json.simple.parser.JSONParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
+import com.nitk.nsetools.domain.IndexQuote;
 import com.nitk.nsetools.domain.StockQuote;
 
 public class NSETools implements ExchangeToolsInterface{
@@ -240,8 +241,57 @@ public class NSETools implements ExchangeToolsInterface{
     }
     
     public List<StockQuote> getTopGainers() throws Exception {
-        // TODO Auto-generated method stub
         return this.getTop(topGainerURL);
     }
+
+
+    @Override
+    public List<IndexQuote> getAllIndicesQuotes() throws Exception {
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        CloseableHttpResponse response = client.execute(new HttpGet(indexURL));
+        if(response.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
+            methodCleanup(client, response, null);
+            throw new HttpException("Unable to connect to NSE");
+        }
+        try {
+            List<IndexQuote> indexQuoteList = new ArrayList<IndexQuote>();
+            JSONObject jsonObject = (JSONObject)new JSONParser().parse(
+                    new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+            JSONArray dataArray = (JSONArray) jsonObject.get("data");
+            for(int iter=0;iter<dataArray.size();iter++) {
+                JSONObject data = (JSONObject) dataArray.get(iter);
+                IndexQuote temp = new IndexQuote();
+                for(Iterator iterator = data.keySet().iterator(); iterator.hasNext();) {
+                    String key = (String)iterator.next();
+                    if(key.equalsIgnoreCase("pChange")||key.equalsIgnoreCase("change")||key.equalsIgnoreCase("lastPrice")) {
+                        setFieldInObject(temp,key,new BigDecimal(((String)data.get(key)).replaceAll(",","")));
+                    }else if(key.equalsIgnoreCase("name")) {
+                        setFieldInObject(temp,key,(String)data.get(key));
+                    }
+                }
+                indexQuoteList.add(temp);
+            }
+            methodCleanup(client,response,null);
+            return indexQuoteList;
+        }catch(Exception e) {
+            methodCleanup(client,response,this.indexList);
+            throw e;
+        }
+    }
+
+    public IndexQuote getIndexQuote(String index) throws Exception {
+        if(!this.getIndexList().contains(index.toUpperCase())) {
+            throw new Exception("Index - "+index+" - is not valid");
+        }else {
+            List<IndexQuote> indexQuoteList = this.getAllIndicesQuotes();
+            for(IndexQuote indexQuote : indexQuoteList) {
+                if(indexQuote.getName().equalsIgnoreCase(index)) {
+                    return indexQuote;
+                }
+            }
+            throw new Exception("Index - "+index+" - present in list. But no quotes found");
+        }
+    }
+
     
 }

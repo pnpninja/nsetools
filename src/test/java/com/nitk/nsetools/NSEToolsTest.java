@@ -2,6 +2,7 @@ package com.nitk.nsetools;
 
 import org.junit.*;
 
+import com.nitk.nsetools.domain.IndexQuote;
 import com.nitk.nsetools.domain.StockQuote;
 
 import static org.junit.Assert.assertEquals;
@@ -87,6 +88,33 @@ public class NSEToolsTest {
         try {
             List<StockQuote> topLosersList = nse.getTopLosers();
             assertTrue(true);
+        }catch(Exception e) {
+            assertTrue(false);
+        }
+    }
+    
+    @Test
+    public void checkGetAllIndicesQuotes() {
+        boolean foundFlag = false;
+        try {
+            List<IndexQuote> indexQuotes = nse.getAllIndicesQuotes();
+            for(IndexQuote indexQuote : indexQuotes) {
+                if(indexQuote.getName().equalsIgnoreCase("NIFTY50 TR 2X LEV")) {
+                    foundFlag = true;
+                }
+            }
+            assertTrue(foundFlag);
+            
+        }catch(Exception e) {
+            assertTrue(false);
+        }
+    }
+    
+    @Test
+    public void checkGetIndexQuote() {
+        try {
+            assertTrue(nse.getIndexQuote("NIFTY50 TR 2X LEV")!=null);
+            
         }catch(Exception e) {
             assertTrue(false);
         }

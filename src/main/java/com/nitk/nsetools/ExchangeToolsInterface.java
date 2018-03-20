@@ -1,5 +1,6 @@
 package com.nitk.nsetools;
 
+import com.nitk.nsetools.domain.IndexQuote;
 import com.nitk.nsetools.domain.StockQuote;
 import java.util.HashMap;
 import java.util.List;
@@ -12,4 +13,6 @@ public interface ExchangeToolsInterface {
     public StockQuote getQuote(String symbol) throws Exception;
     public List<StockQuote> getTopGainers() throws Exception;
     public List<StockQuote> getTopLosers() throws Exception;
+    public List<IndexQuote> getAllIndicesQuotes() throws Exception;
+    public IndexQuote getIndexQuote(String index) throws Exception;
 }
