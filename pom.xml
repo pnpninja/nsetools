@@ -4,7 +4,7 @@
   <groupId>com.nitk</groupId>
   <artifactId>nsetools</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0-RELEASE</version>
   <name>nsetools</name>
   <url>http://maven.apache.org</url>
   <dependencies>

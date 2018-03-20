@@ -113,10 +113,15 @@ public class NSEToolsTest {
     @Test
     public void checkGetIndexQuote() {
         try {
-            assertTrue(nse.getIndexQuote("NIFTY50 TR 2X LEV")!=null);
-            
+            assertTrue(nse.getIndexQuote("NIFTY50 TR 2X LEV")!=null);           
         }catch(Exception e) {
             assertTrue(false);
+        }
+        
+        try {
+            nse.getIndexQuote("Nsjdfsjdbf");
+        }catch(Exception e) {
+            assertTrue(true);
         }
     }
 }
