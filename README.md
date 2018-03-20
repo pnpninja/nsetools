@@ -18,6 +18,19 @@ Main Features:
 * Helper methods to check whether a given stock code or index code is correct
 * Getting list of all indices and stocks
 
+Getting Started:
+=============
+
+Add this to you project's `pom.xml` - 
+
+```xml
+<dependency>
+  <groupId>com.github.pnpninja</groupId>
+  <artifactId>nsetools</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
 Dependencies
 =============
 
