@@ -11,12 +11,12 @@ nsetools is a library for collecting real time data from National Stock Exchange
 Main Features:
 =============
 
-* Getting live quotes for stocks using stock codes. (DONE)
-* Getting quotes for all the indices traded in NSE, e.g CNX NIFTY, BANKNIFTY etc. (To be done)
-* Getting list of top losers. (DONE)
-* Getting list of top gainers. (DONE)
-* Helper APIs to check whether a given stock code or index code is correct. (DONE)
-* Getting list of all indices and stocks. (DONE)
+* Getting live quotes for stocks using stock codes
+* Getting quotes for all the indices traded in NSE, e.g CNX NIFTY, BANKNIFTY etc
+* Getting list of top losers
+* Getting list of top gainers
+* Helper methods to check whether a given stock code or index code is correct
+* Getting list of all indices and stocks
 
 Dependencies
 =============
